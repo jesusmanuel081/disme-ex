@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Topbar from '@/components/layout/Topbar';
 import PieChart from '@/components/charts/PieChart';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { formatCurrency } from '@/lib/utils';
 
 export default function DashboardPage() {
@@ -25,6 +25,7 @@ export default function DashboardPage() {
 
   async function loadDashboardData() {
     setLoading(true);
+    const supabase = createClient();
 
     // Load counts
     const [products, customers, orders, payments] = await Promise.all([

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Topbar from '@/components/layout/Topbar';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
   ssr: false,
@@ -34,16 +34,19 @@ export default function RoutesContent() {
   }, []);
 
   async function loadRoutes() {
+    const supabase = createClient();
     const { data } = await supabase.from('routes').select('*').order('date', { ascending: false });
     setRoutes(data || []);
   }
 
   async function loadCustomers() {
+    const supabase = createClient();
     const { data } = await supabase.from('customers').select('id, company_name');
     setCustomers(data || []);
   }
 
   async function loadStops(routeId) {
+    const supabase = createClient();
     const { data } = await supabase
       .from('route_stops')
       .select('*, customers(company_name)')
@@ -59,6 +62,7 @@ export default function RoutesContent() {
 
   async function handleSaveRoute(e) {
     e.preventDefault();
+    const supabase = createClient();
     await supabase.from('routes').insert([routeForm]);
     setShowModal(false);
     setRouteForm({ name: '', driver_name: '', vehicle: '', date: new Date().toISOString().split('T')[0], start_point: '' });
@@ -68,6 +72,7 @@ export default function RoutesContent() {
   async function handleSaveStop(e) {
     e.preventDefault();
     if (!selectedRoute) return;
+    const supabase = createClient();
     const maxOrder = stops.length > 0 ? Math.max(...stops.map((s) => s.stop_order)) : 0;
     await supabase.from('route_stops').insert([{
       route_id: selectedRoute.id,
@@ -84,6 +89,7 @@ export default function RoutesContent() {
 
   async function handleDeleteRoute(route) {
     if (confirm(`¿Eliminar ruta "${route.name}"?`)) {
+      const supabase = createClient();
       await supabase.from('routes').delete().eq('id', route.id);
       if (selectedRoute?.id === route.id) {
         setSelectedRoute(null);

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/layout/Topbar';
 import PieChart from '@/components/charts/PieChart';
 import DataTable from '@/components/tables/DataTable';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 const columns = [
   { key: 'sku', label: 'SKU' },
@@ -32,6 +32,7 @@ export default function InventoryPage() {
 
   async function loadProducts() {
     setLoading(true);
+    const supabase = createClient();
     const { data } = await supabase.from('products').select('*').order('name');
     setProducts(data || []);
 
@@ -46,6 +47,7 @@ export default function InventoryPage() {
 
   async function handleSave(e) {
     e.preventDefault();
+    const supabase = createClient();
     if (editing) {
       await supabase.from('products').update(form).eq('id', editing.id);
     } else {
@@ -59,6 +61,7 @@ export default function InventoryPage() {
 
   async function handleDelete(row) {
     if (confirm(`¿Eliminar "${row.name}"?`)) {
+      const supabase = createClient();
       await supabase.from('products').delete().eq('id', row.id);
       loadProducts();
     }

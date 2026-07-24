@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/layout/Topbar';
 import PieChart from '@/components/charts/PieChart';
 import DataTable from '@/components/tables/DataTable';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 const columns = [
@@ -28,6 +28,7 @@ export default function PaymentsPage() {
   useEffect(() => { loadPayments(); loadOrders(); }, []);
 
   async function loadPayments() {
+    const supabase = createClient();
     const { data } = await supabase
       .from('payments')
       .select('*, orders(id, total)')
@@ -47,12 +48,14 @@ export default function PaymentsPage() {
   }
 
   async function loadOrders() {
+    const supabase = createClient();
     const { data } = await supabase.from('orders').select('id, total, status, customers(company_name)');
     setOrders(data || []);
   }
 
   async function handleSave(e) {
     e.preventDefault();
+    const supabase = createClient();
     await supabase.from('payments').insert([form]);
     setShowModal(false);
     setForm({ order_id: '', amount: 0, method: 'cash', status: 'pending', reference: '' });
@@ -61,6 +64,7 @@ export default function PaymentsPage() {
 
   async function handleDelete(row) {
     if (confirm('¿Eliminar este pago?')) {
+      const supabase = createClient();
       await supabase.from('payments').delete().eq('id', row.id);
       loadPayments();
     }

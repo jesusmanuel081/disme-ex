@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/layout/Topbar';
 import PieChart from '@/components/charts/PieChart';
 import DataTable from '@/components/tables/DataTable';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 const columns = [
   { key: 'company_name', label: 'Empresa' },
@@ -28,6 +28,7 @@ export default function SuppliersPage() {
 
   async function loadSuppliers() {
     setLoading(true);
+    const supabase = createClient();
     const { data } = await supabase.from('suppliers').select('*').order('company_name');
     setSuppliers(data || []);
 
@@ -43,6 +44,7 @@ export default function SuppliersPage() {
 
   async function handleSave(e) {
     e.preventDefault();
+    const supabase = createClient();
     if (editing) {
       await supabase.from('suppliers').update(form).eq('id', editing.id);
     } else {
@@ -56,6 +58,7 @@ export default function SuppliersPage() {
 
   async function handleDelete(row) {
     if (confirm(`¿Eliminar proveedor "${row.company_name}"?`)) {
+      const supabase = createClient();
       await supabase.from('suppliers').delete().eq('id', row.id);
       loadSuppliers();
     }

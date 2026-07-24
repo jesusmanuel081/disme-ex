@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/layout/Topbar';
 import PieChart from '@/components/charts/PieChart';
 import DataTable from '@/components/tables/DataTable';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { formatCurrency } from '@/lib/utils';
 
 const columns = [
@@ -30,6 +30,7 @@ export default function CustomersPage() {
 
   async function loadCustomers() {
     setLoading(true);
+    const supabase = createClient();
     const { data } = await supabase.from('customers').select('*').order('company_name');
     setCustomers(data || []);
 
@@ -45,6 +46,7 @@ export default function CustomersPage() {
 
   async function handleSave(e) {
     e.preventDefault();
+    const supabase = createClient();
     if (editing) {
       await supabase.from('customers').update(form).eq('id', editing.id);
     } else {
@@ -58,6 +60,7 @@ export default function CustomersPage() {
 
   async function handleDelete(row) {
     if (confirm(`¿Eliminar cliente "${row.company_name}"?`)) {
+      const supabase = createClient();
       await supabase.from('customers').delete().eq('id', row.id);
       loadCustomers();
     }

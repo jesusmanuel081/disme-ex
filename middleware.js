@@ -1,27 +1,19 @@
-import { NextResponse } from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Allow login page and public assets
   if (
-    pathname.startsWith('/login') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.includes('.')
   ) {
-    return NextResponse.next();
+    return undefined;
   }
 
-  // Check for session cookie (basic check)
-  const session = request.cookies.get('sb-access-token');
+  const { supabaseResponse } = updateSession(request);
 
-  if (!session && pathname !== '/login') {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
