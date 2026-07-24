@@ -5,9 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix leaflet default icon issue
-delete L.Icon.Default.prototype._getIconUrl;
-
 const STATUS_COLORS = {
   pending: '#D97706',
   arrived: '#2563EB',
@@ -23,13 +20,13 @@ function createIcon(color) {
   });
 }
 
-// Center of Chihuahua state
 const CHIHUAHUA_CENTER = [28.6353, -106.0889];
 
 export default function RouteMap({ stops = [], routeLines = [] }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    delete L.Icon.Default.prototype._getIconUrl;
     setMounted(true);
   }, []);
 

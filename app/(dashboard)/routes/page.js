@@ -1,9 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Topbar from '@/components/layout/Topbar';
-import RouteMap from '@/components/maps/RouteMap';
 import { supabase } from '@/lib/supabase/client';
+
+const RouteMap = dynamic(() => import('@/components/maps/RouteMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-gray-100 rounded-xl flex items-center justify-center text-text-muted text-sm">
+      Cargando mapa...
+    </div>
+  ),
+});
 
 export default function RoutesPage() {
   const [routes, setRoutes] = useState([]);
